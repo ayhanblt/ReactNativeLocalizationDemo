@@ -1,0 +1,9 @@
+{
+  "welcome": "Hoş Geldiniz",
+  "stepOne": "Birinci Adım",
+  "editFile": "Bu ekranı değiştirmek için {file} dosyasını düzenleyin ve değişikliklerinizi görmek için geri gelin.",
+  "seeChanges": "Değişikliklerinizi Görün",
+  "debug": "Hata Ayıklama",
+  "learnMore": "Daha Fazla Bilgi",
+  "readDocs": "Sırada ne yapacağınızı öğrenmek için belgeleri okuyun:"
+}

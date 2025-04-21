@@ -1,0 +1,9 @@
+{
+  "welcome": "Welcome",
+  "stepOne": "Step One",
+  "editFile": "Edit {file} to change this screen and then come back to see your edits.",
+  "seeChanges": "See Your Changes",
+  "debug": "Debug",
+  "learnMore": "Learn More",
+  "readDocs": "Read the docs to discover what to do next:"
+}
