@@ -53,8 +53,15 @@ const setI18nConfig = () => {
   i18n.locale = languageTag;
 };
 
-function Section({children, title}: {children: React.ReactNode; title: string}): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+// Section component now accepts isDarkMode as a prop
+interface SectionProps {
+  children: React.ReactNode;
+  title: string;
+  isDarkMode: boolean; // Added isDarkMode prop
+}
+
+function Section({children, title, isDarkMode}: SectionProps): JSX.Element {
+  // const isDarkMode = useColorScheme() === 'dark'; // REMOVED: uses passed prop now
   return (
     <View style={styles.sectionContainer}>
       <Text
@@ -79,8 +86,13 @@ function Section({children, title}: {children: React.ReactNode; title: string}):
   );
 }
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+interface AppProps {
+  forcedColorScheme?: 'light' | 'dark';
+}
+
+function App({ forcedColorScheme }: AppProps): JSX.Element {
+  const scheme = useColorScheme();
+  const isDarkMode = forcedColorScheme ? forcedColorScheme === 'dark' : scheme === 'dark';
   const [currentLocale, setCurrentLocale] = React.useState<string>('en');
 
   React.useEffect(() => {
@@ -98,6 +110,7 @@ function App(): JSX.Element {
   }, []);
 
   const toggleLanguage = React.useCallback(() => {
+    translate.cache.clear(); // Add this line
     const newLocale = currentLocale === 'en' ? 'tr' : 'en';
     i18n.locale = newLocale;
     setCurrentLocale(newLocale);
@@ -110,17 +123,18 @@ function App(): JSX.Element {
   const safePadding = 24;
 
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaView style={backgroundStyle} testID="safe-area-view">
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView style={backgroundStyle}>
+      <ScrollView style={backgroundStyle} contentContainerStyle={styles.scrollViewContent}>
         <View style={{paddingRight: safePadding}}>
-          <Header />
+          <Header testID="app-header"/>
           <TouchableOpacity 
             style={styles.languageButton} 
             onPress={toggleLanguage}
+            testID="language-toggle-button"
           >
             <Text style={styles.languageButtonText}>
               {currentLocale === 'en' ? 'TR' : 'EN'}
@@ -128,21 +142,26 @@ function App(): JSX.Element {
           </TouchableOpacity>
         </View>
         <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title={translate('stepOne')}>
+          style={[
+            styles.contentContainer,
+            {
+              backgroundColor: isDarkMode ? Colors.black : Colors.white,
+              paddingHorizontal: safePadding,
+              paddingBottom: safePadding,
+            }
+          ]}
+          testID="main-content-view"
+          >
+          <Section title={translate('stepOne')} isDarkMode={isDarkMode}>
             {translate('editFile', { file: 'App.tsx' })}
           </Section>
-          <Section title={translate('seeChanges')}>
+          <Section title={translate('seeChanges')} isDarkMode={isDarkMode}>
             <ReloadInstructions />
           </Section>
-          <Section title={translate('debug')}>
+          <Section title={translate('debug')} isDarkMode={isDarkMode}>
             <DebugInstructions />
           </Section>
-          <Section title={translate('learnMore')}>
+          <Section title={translate('learnMore')} isDarkMode={isDarkMode}>
             {translate('readDocs')}
           </Section>
           <LearnMoreLinks />
@@ -172,18 +191,26 @@ const styles = StyleSheet.create({
   languageButton: {
     position: 'absolute',
     top: 20,
-    right: 20,
+    // Adjust right positioning if safePadding is used globally for the parent View
+    right: 0, // Assuming paddingRight on parent View handles the actual spacing
     padding: 10,
-    backgroundColor: Colors.lighter,
+    // backgroundColor: Colors.lighter, // Button background might change with theme
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: Colors.dark,
+    // borderColor: Colors.dark, // Border color might change with theme
   },
   languageButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.dark,
+    // color: Colors.dark, // Text color might change with theme
   },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
+  contentContainer: {
+    // This View wraps all the Section components and LearnMoreLinks
+    // It will have its background color changed based on isDarkMode
+  }
 });
 
 export default App;
